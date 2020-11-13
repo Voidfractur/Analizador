@@ -268,6 +268,7 @@ public class Analizador {
                     pila.pop();
                     pila.pop();
                     pila.pop();
+                    pila.pop();
                     pila.push("IDOPE");
                 System.out.println("entro if16"+pila.peek()); 
                 verPila();
@@ -294,42 +295,21 @@ public class Analizador {
                         temporal = pila.pop();
                         numRenglon++;
                         listaSalida.add(generarRenglon(numRenglon, temporal));
-                        if (f2) {
-                            if (fprimerCodigo) {
-                                generarPadreDosOpciones("DECLARACION", "LW", numRenglon);
-                                temporal =pila.pop();
-                                numRenglon++;
-                                listaSalida.add(generarRenglon(numRenglon, temporal));
-                                generarPadreDosOpciones("DECLARACION", "LW", numRenglon);
-                                pila.push("CODIGO");
-                            } else {
-                                generarPadre("tk_;", numRenglon);
-                                generarPadre("IDOPE", numRenglon);
-                                temporal =pila.pop();
-                                numRenglon++;
-                                listaSalida.add(generarRenglon(numRenglon, temporal));
-                                generarPadre("CODIGO", numRenglon);
-                                pila.push("CODIGO");
-                            }
+                        if (fprimerCodigo) {
+                            generarPadreTresOpciones("IDOPE", "LW", "DECLARACION", numRenglon);
+                            temporal = pila.pop();
+                            numRenglon++;
+                            listaSalida.add(generarRenglon(numRenglon, temporal));
+                            generarPadreTresOpciones("IDOPE", "LW", "DECLARACION", numRenglon);
+                            fprimerCodigo=false;
                         }else{
-                            if (fprimerCodigo) {
-                                generarPadreDosOpciones("DECLARACION", "LW", numRenglon);
-                                temporal =pila.pop();
-                                numRenglon++;
-                                listaSalida.add(generarRenglon(numRenglon, temporal));
-                                generarPadreDosOpciones("DECLARACION", "LW", numRenglon);
-                                pila.push("CODIGO");
-                            } else {
-                               generarPadreDosOpciones("DECLARACION", "LW", numRenglon);
-                               temporal =pila.pop();
-                                numRenglon++;
-                                listaSalida.add(generarRenglon(numRenglon, temporal));
-                                generarPadre("CODIGO", numRenglon);
-                                pila.push("CODIGO");
-                            }
+                            generarPadre("CODIGO", numRenglon+1);
+                            generarPadre("CODIGO", numRenglon+1);
+                            generarPadreTresOpciones("IDOPE", "LW", "DECLARACION", numRenglon);
+                            temporal = pila.pop();
+                            numRenglon++;
+                            listaSalida.add(generarRenglon(numRenglon, temporal));
                         }
-                        
-                        
                         fParametro=false;
                     }else{
                         temporal = pila.pop();
@@ -343,6 +323,13 @@ public class Analizador {
                             generarPadre("tk_;", numRenglon);
                              generarPadre("PARAMETRO", numRenglon);
                              generarPadre("FUNCION", numRenglon);
+                        }
+                        if (temporal.equals("IDOPE")) {
+                            generarPadre("tk_;", numRenglon);
+                            generarPadre("OPERACION", numRenglon);
+                            generarPadre("tk_=", numRenglon);
+                            generarPadre("IDASIG", numRenglon);
+                            
                         }
                         pila.push("CODIGO");
                         
@@ -360,6 +347,8 @@ public class Analizador {
         }
     }
     public boolean esIdope(){
+        if (pila.peek().equals("tk_;")) {
+            String z = pila.pop();
         if (pila.peek().equals("OPERACION")) {
             String a = pila.pop();
             if (pila.peek().equals("tk_=")) {
@@ -367,17 +356,21 @@ public class Analizador {
                 if (pila.peek().equals("IDASIG")) {
                     pila.push(b);
                     pila.push(a);
-                    fParametro=true;
+                    pila.push(z);
+                    //fParametro=true;
                 return true;
                 }else{
                     pila.push(b);
                     pila.push(a);
+                    pila.push(z);
                 }
             }else{
                 pila.push(a);
+                pila.push(z);
             }
         }else{
-            
+            pila.push(z);
+        }
         }/*
         if (pila.peek().equals("tk_;")) {
             String a = pila.pop();
@@ -399,34 +392,19 @@ public class Analizador {
             if (pila.peek().equals("CODIGO")) {
                 pila.push(a);
                 fParametro=true;
-                f2=true;
                 return true;
             }else{
                 pila.push(a);
             }
-        }else{
-            
-        }
-        if (pila.peek().equals("tk_;")) {
-            String a = pila.pop();
-            if (pila.peek().equals("IDOPE")) {
-                pila.push(a);
-                fParametro=true;
-                return true;
-            }else{
-                pila.push(a);
-            }
-        }else{
-            
         }
         if (pila.peek().equals("DECLARACION")) {
             fParametro = false;
             return true;
-        }/*
+        }
         if (pila.peek().equals("IDOPE")) {
             fParametro = false;
             return true;
-        }*/
+        }
         if (pila.peek().equals("LW")) {
             fParametro = false;
             return true;
@@ -1002,7 +980,15 @@ public class Analizador {
             }
         }
     }
-
+public void generarPadreTresOpciones(String palabra,String text,String text2,int num){
+        for (int i = listaSalida.size()-2; i > 0; i--) {
+            if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text2) && listaSalida.get(i).isFpadre()==false ) {
+                listaSalida.get(i).setPadre(num);
+                listaSalida.get(i).setFpadre(true);
+                break;
+            }
+        }
+    }
     public ArrayList<Renglon> getListaSalida() {
         return listaSalida;
     }
