@@ -64,7 +64,7 @@ public class Analizador {
         //}
         //for (String listaToken : listaTokens) {
              
-            System.out.println("Pila "+pila.peek());
+           
              if (esInicio()) {
                  
                  temporal =pila.pop();
@@ -74,7 +74,7 @@ public class Analizador {
                  numRenglon++;
                  listaSalida.add(generarRenglon(numRenglon, temporal));
                  pila.push("INICIO");
-             System.out.println("entro if"+pila.peek());
+             
              verPila();
             }
              if (esTipo()) {
@@ -82,7 +82,7 @@ public class Analizador {
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("TIPO");
-                System.out.println("entro if2"+pila.peek());
+                
                 verPila();
             }  
              /*
@@ -99,7 +99,7 @@ public class Analizador {
                numRenglon++;
                listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("VALOR");
-                System.out.println("entro if4"+pila.peek());
+                
                 verPila();
             }
              
@@ -111,14 +111,14 @@ public class Analizador {
                numRenglon++;
                listaSalida.add(generarRenglon(numRenglon, temporal));
                      generarPadre("tk_)", numRenglon);
-                     generarPadreTresOpciones("IDASIG", "VALOR", "OPERACION", i);
+                     generarPadreTresOpciones("IDASIG", "VALOR", "OPERACION", numRenglon);
                 temporal = pila.pop();
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 temporal = pila.pop();
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
-                     generarPadreTresOpciones("tk_id", "ASIG", "tk_num", i);
+                     generarPadreTresOpciones("tk_id", "ASIG", "tk_num", numRenglon);
                 pila.push("PARAMETRO");
                 verPila();
                  }else{
@@ -146,10 +146,14 @@ public class Analizador {
                       temporal = pila.pop();
                       numRenglon++;
                       listaSalida.add(generarRenglon(numRenglon, temporal));
+                         System.out.println("tk_) "+getPosicionLexema("tk_)"));
+                         System.out.println("PARAMETRO "+getPosicionLexema("PARAMETRO"));
                          if (getPosicionLexema("tk_)")>getPosicionLexema("PARAMETRO")) {
+                             System.out.println("-- )--");
                              generarPadre("tk_)", numRenglon);
                              generarPadreTresOpciones("IDASIG","VALOR", "OPERACION", numRenglon);
                          }else{
+                             System.out.println("** parametro **");
                              generarPadre("PARAMETRO", numRenglon);
                              generarPadre("tk_,", numRenglon);
                              generarPadreDosOpciones("IDASIG", "VALOR", numRenglon);
@@ -176,16 +180,25 @@ public class Analizador {
             }
              */
              if (esTipoOpe()) {
-                pila.pop();
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("TIPOOPE");
-                System.out.println("entro if7"+pila.peek());
+                
                 verPila();
             }
              if (esOperacion()) {
-                pila.pop();
-                pila.pop();
+               temporal = pila.pop();
+               numRenglon++;
+               listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadre("PARAMETRO", numRenglon);
+                 generarPadre("tk_(", numRenglon);
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadreCuatroOpciones("tk_ADD", "tk_MUL", "tk_DIV", "tk_SUB", numRenglon);
                 pila.push("OPERACION");
-                System.out.println("entro if8"+pila.peek());
+                
                 verPila();
             }
              /*
@@ -217,7 +230,7 @@ public class Analizador {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 generarPadre("tk_id", numRenglon);
                 pila.push("ASIG");
-                System.out.println("entro if11"+pila.peek());
+                
                 verPila();
             }
              if (esIdasig()) {
@@ -231,7 +244,7 @@ public class Analizador {
                      f2=false;
                  }
                 pila.push("IDASIG");
-                System.out.println("entro if12"+pila.peek());
+                
                 verPila();
             }
              
@@ -241,7 +254,7 @@ public class Analizador {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 
                 pila.push("FUNCION");
-                System.out.println("entro if13"+pila.peek());
+                
                 verPila();
             }
              if (esLW()) {
@@ -258,7 +271,7 @@ public class Analizador {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                  generarPadreDosOpciones("tk_WRITE", "tk_READ", numRenglon);
                 pila.push("LW");
-                 System.out.println("entro if14"+pila.peek());
+                 
                  verPila();
             }
              
@@ -286,7 +299,7 @@ public class Analizador {
                      generarPadreDosOpciones("tk_id","ASIG", numRenglon);
                 
                 pila.push("LISTA");
-                System.out.println("entro for"+pila.peek());
+                
                 verPila();
                  }else{
                 temporal = pila.pop();
@@ -299,7 +312,7 @@ public class Analizador {
                 //generarPadre("tk_id", numRenglon);
                 pila.push("LISTA");
                 fprimerDiferente = true;
-                 System.out.println("entro for"+pila.peek());
+                 
                  verPila();
                  }
             }
@@ -317,19 +330,30 @@ public class Analizador {
                  listaSalida.add(generarRenglon(numRenglon, temporal));
                  generarPadreDosOpciones("tk_INTEGER", "tk_REAL", numRenglon);
                  pila.push("DECLARACION");
-                System.out.println("entro if15"+pila.peek());
+                
                 verPila();
             }
              
             
                 if (esIdope()) {
                 // if (fParametro) {
-                    pila.pop();
-                    pila.pop();
-                    pila.pop();
-                    pila.pop();
+                    temporal = pila.pop();
+                    numRenglon++;
+                    listaSalida.add(generarRenglon(numRenglon, temporal));
+                    temporal = pila.pop();
+                    numRenglon++;
+                    listaSalida.add(generarRenglon(numRenglon, temporal));
+                    generarPadre("PARAMETRO", numRenglon);
+                    generarPadre("TIPOOPE", numRenglon);
+                    temporal = pila.pop();
+                    numRenglon++;
+                    listaSalida.add(generarRenglon(numRenglon, temporal));
+                    temporal = pila.pop();
+                    numRenglon++;
+                    listaSalida.add(generarRenglon(numRenglon, temporal));
+                    generarPadre("tk_id", numRenglon);
                     pila.push("IDOPE");
-                System.out.println("entro if16"+pila.peek()); 
+                 
                 verPila();
                 /* }else{
                     pila.pop();
@@ -345,7 +369,7 @@ public class Analizador {
                 pila.pop();
                 pila.pop();
                 pila.push("FIN");
-                System.out.println("entro if16"+pila.peek());
+                
                 verPila();
             }
             for (int i = 0; i < 10; i++) {
@@ -370,6 +394,7 @@ public class Analizador {
                             listaSalida.add(generarRenglon(numRenglon, temporal));
                         }
                         fParametro=false;
+                        pila.push("CODIGO");
                     }else{
                         temporal = pila.pop();
                         numRenglon++;
@@ -938,7 +963,7 @@ public class Analizador {
     
     
     public ArrayList<String> acortarLista(ArrayList<String> a){
-        System.out.println("llamada a acortar");
+        
         int conta=0;
         int contb=0;
         ArrayList<String> listaAcortada = new ArrayList<String>();
@@ -1007,6 +1032,15 @@ public class Analizador {
 public void generarPadreTresOpciones(String palabra,String text,String text2,int num){
         for (int i = listaSalida.size()-2; i > 0; i--) {
             if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text2) && listaSalida.get(i).isFpadre()==false ) {
+                listaSalida.get(i).setPadre(num);
+                listaSalida.get(i).setFpadre(true);
+                break;
+            }
+        }
+    }
+public void generarPadreCuatroOpciones(String palabra,String text,String text2,String text3,int num){
+        for (int i = listaSalida.size()-2; i > 0; i--) {
+            if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text2) && listaSalida.get(i).isFpadre()==false ||   listaSalida.get(i).getLexema().equals(text3) && listaSalida.get(i).isFpadre()==false) {
                 listaSalida.get(i).setPadre(num);
                 listaSalida.get(i).setFpadre(true);
                 break;
