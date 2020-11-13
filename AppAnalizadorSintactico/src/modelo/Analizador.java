@@ -189,7 +189,10 @@ public class Analizador {
             }
              
              if (esFuncion()) {
-                pila.pop();
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                
                 pila.push("FUNCION");
                 System.out.println("entro if13"+pila.peek());
                 verPila();
@@ -756,6 +759,25 @@ public class Analizador {
             String a = pila.pop();
             if (pila.peek().equals("tk_,")) {
                 String b = pila.pop();
+                if (pila.peek().equals("IDASIG")) {
+                    pila.push(b);
+                    pila.push(a);
+                    fParametro = true;
+                return true;
+                }else{
+                    pila.push(b);
+                    pila.push(a);
+                }
+            }else{
+                pila.push(a);
+            }
+        }else{
+            
+        }
+        if (pila.peek().equals("PARAMETRO")) {
+            String a = pila.pop();
+            if (pila.peek().equals("tk_,")) {
+                String b = pila.pop();
                 if (pila.peek().equals("VALOR")) {
                     pila.push(b);
                     pila.push(a);
@@ -797,6 +819,7 @@ public class Analizador {
             
         }
         return false;
+        
     }
     public boolean esValores(){
         if (pila.peek().equals("VALOR")) {
