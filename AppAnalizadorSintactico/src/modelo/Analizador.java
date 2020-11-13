@@ -18,12 +18,14 @@ public class Analizador {
     private Stack<String> pila;
     private ArrayList<String> historiaPila;
     boolean fParametro;
+    boolean fParametro2;
     boolean f2;
     private ArrayList<Renglon> listaSalida;
     public Analizador(ArrayList<String> listaTokens) {
         this.listaTokens=acortarLista(listaTokens);
         pila= new Stack<String>();
         fParametro = false;
+        fParametro2 = false;
         f2=false;
         historiaPila = new ArrayList<String>();
         listaSalida = new ArrayList<Renglon>();
@@ -105,16 +107,61 @@ public class Analizador {
                 
                if (esParametro()) {
                  if (fParametro) {
-                pila.pop();
-                pila.pop();
-                pila.pop();
+               temporal = pila.pop();
+               numRenglon++;
+               listaSalida.add(generarRenglon(numRenglon, temporal));
+                     generarPadre("tk_)", numRenglon);
+                     generarPadreTresOpciones("IDASIG", "VALOR", "OPERACION", i);
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                     generarPadreTresOpciones("tk_id", "ASIG", "tk_num", i);
                 pila.push("PARAMETRO");
                 verPila();
                  }else{
-                pila.pop();
-                pila.pop();
-                pila.push("PARAMETRO");
-                verPila();
+                     if (!fParametro2) {
+                        temporal = pila.pop();
+                        numRenglon++;
+                        listaSalida.add(generarRenglon(numRenglon, temporal));
+                        temporal = pila.pop();
+                        numRenglon++;
+                        listaSalida.add(generarRenglon(numRenglon, temporal));
+                         if (temporal.equals("IDASIG")) {
+                             generarPadreDosOpciones("tk_id", "ASIG", numRenglon);
+                         }
+                         if (temporal.equals("VALOR")) {
+                             generarPadre("tk_num", numRenglon);
+                         }
+                         if (temporal.equals("OPERACION")) {
+                             generarPadre("OPERACION", numRenglon);
+                             generarPadre("TIPOOPE", numRenglon);
+                         }
+                        pila.push("PARAMETRO");
+                        verPila();
+                       
+                     }else{
+                      temporal = pila.pop();
+                      numRenglon++;
+                      listaSalida.add(generarRenglon(numRenglon, temporal));
+                         if (getPosicionLexema("tk_)")>getPosicionLexema("PARAMETRO")) {
+                             generarPadre("tk_)", numRenglon);
+                             generarPadreTresOpciones("IDASIG","VALOR", "OPERACION", numRenglon);
+                         }else{
+                             generarPadre("PARAMETRO", numRenglon);
+                             generarPadre("tk_,", numRenglon);
+                             generarPadreDosOpciones("IDASIG", "VALOR", numRenglon);
+                     }
+                     
+                       temporal = pila.pop();
+                       numRenglon++;
+                       listaSalida.add(generarRenglon(numRenglon, temporal));
+                       pila.push("PARAMETRO");
+                       verPila();  
+                       fParametro2=false;
+                     }
                  }
                  
             } 
@@ -198,9 +245,18 @@ public class Analizador {
                 verPila();
             }
              if (esLW()) {
-                pila.pop();
-                pila.pop();
-                pila.pop();
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadre("PARAMETRO", numRenglon);
+                 generarPadre("tk_(", numRenglon);
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadreDosOpciones("tk_WRITE", "tk_READ", numRenglon);
                 pila.push("LW");
                  System.out.println("entro if14"+pila.peek());
                  verPila();
@@ -669,54 +725,12 @@ public class Analizador {
     }
     
     public boolean esParametro(){
-        /*
-        if (pila.peek().equals("tk_id")) {
-            String a = pila.pop();
-            if (pila.peek().equals("tk_,")) {
-                String b = pila.pop();
-                if (pila.peek().equals("tk_id")) {
-                    pila.push(b);
-                    pila.push(a);
-                    fParametro = false;
-                    return true;
-                }else{
-                    pila.push(b);
-                    pila.push(a);
-                }
-            }else{
-                 pila.push(a);
-            }
-        }
-        
-        if (pila.peek().equals("VALORES")) {
-            fParametro = true;
-            return true;
-            
-        }
-        if (pila.peek().equals("OPERACION")) {
-            String a = pila.pop();
-            if (pila.peek().equals("tk_,")) {
-                String b = pila.pop();
-                if (pila.peek().equals("tk_id")) {
-                    pila.push(b);
-                    pila.push(a);
-                    fParametro = false;
-                    return true;
-                }else{
-                    pila.push(b);
-                    pila.push(a);
-                }
-            }else{
-                 pila.push(a);
-            }
-        }
-       return false; 
-       */
         if (pila.peek().equals("tk_)")) {
             String a = pila.pop();
             if (pila.peek().equals("IDASIG")) {
                 pila.push(a);
                 fParametro = false;
+                fParametro2 =false;
                 return true;
             }else{
                 pila.push(a);
@@ -729,6 +743,7 @@ public class Analizador {
             if (pila.peek().equals("VALOR")) {
                 pila.push(a);
                 fParametro = false;
+                fParametro2=false;
                 return true;
             }else{
                 pila.push(a);
@@ -744,6 +759,7 @@ public class Analizador {
                     pila.push(b);
                     pila.push(a);
                     fParametro = true;
+                    fParametro2=false;
                 return true;
                 }else{
                     pila.push(b);
@@ -755,25 +771,7 @@ public class Analizador {
         }else{
             
         }
-        if (pila.peek().equals("PARAMETRO")) {
-            String a = pila.pop();
-            if (pila.peek().equals("tk_,")) {
-                String b = pila.pop();
-                if (pila.peek().equals("IDASIG")) {
-                    pila.push(b);
-                    pila.push(a);
-                    fParametro = true;
-                return true;
-                }else{
-                    pila.push(b);
-                    pila.push(a);
-                }
-            }else{
-                pila.push(a);
-            }
-        }else{
-            
-        }
+        
         if (pila.peek().equals("PARAMETRO")) {
             String a = pila.pop();
             if (pila.peek().equals("tk_,")) {
@@ -782,6 +780,7 @@ public class Analizador {
                     pila.push(b);
                     pila.push(a);
                     fParametro = true;
+                    fParametro2=false;
                 return true;
                 }else{
                     pila.push(b);
@@ -798,6 +797,7 @@ public class Analizador {
             if (pila.peek().equals("tk_(")) {
                 pila.push(a);
                 fParametro=false;
+                fParametro2=true;
                 return true;
             }else{
                 pila.push(a);
@@ -811,6 +811,7 @@ public class Analizador {
             if (pila.peek().equals("OPERACION")) {
                 pila.push(a);
                 fParametro = false;
+                fParametro2=false;
                 return true;
             }else{
                 pila.push(a);
@@ -1012,6 +1013,34 @@ public void generarPadreTresOpciones(String palabra,String text,String text2,int
             }
         }
     }
+public int getSumaPosicionLexema(String palabra, String text){
+            int a = 0;
+            int x = 0;
+        for (int i = listaSalida.size()-2; i > 0; i--) {
+            
+            if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false) {
+                a=i;
+            }
+        }
+        for (int i = listaSalida.size()-2; i > 0; i--) {
+            if (listaSalida.get(i).getLexema().equals(text) && listaSalida.get(i).isFpadre()==false) {
+                x=i;
+            }
+        }
+        return a+x;
+    }
+
+public int getPosicionLexema(String palabra){
+        for (int i = listaSalida.size()-2; i > 0; i--) {
+            
+            if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false) {
+               return i;
+            }
+        }
+       
+        return 0;
+    }
+
     public ArrayList<Renglon> getListaSalida() {
         return listaSalida;
     }
