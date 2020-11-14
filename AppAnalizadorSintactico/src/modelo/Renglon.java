@@ -15,11 +15,21 @@ public class Renglon {
     private String Lexema;
     private int padre;
     private boolean fpadre;
+    private boolean fid;
 
     public Renglon(int numero, String Lexema) {
         this.numero = numero;
         this.Lexema = Lexema;
         fpadre=false;
+        fid=false;
+    }
+
+    public boolean isFid() {
+        return fid;
+    }
+
+    public void setFid(boolean fid) {
+        this.fid = fid;
     }
 
     public int getNumero() {

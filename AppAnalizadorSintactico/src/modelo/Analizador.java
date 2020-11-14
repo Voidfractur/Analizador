@@ -21,7 +21,10 @@ public class Analizador {
     boolean fParametro2;
     boolean f2;
     private ArrayList<Renglon> listaSalida;
+    private ArrayList<String> listaIdyNum;
+    
     public Analizador(ArrayList<String> listaTokens) {
+        listaIdyNum = new ArrayList<String>();
         this.listaTokens=acortarLista(listaTokens);
         pila= new Stack<String>();
         fParametro = false;
@@ -989,6 +992,17 @@ public class Analizador {
               
                 if (palabra.charAt(i)==' ') {
                     listaAcortada.add(palabra.substring(i+1, palabra.length()-2));
+                    
+                    if (palabra.substring(i+1, palabra.length()-2).equals("tk_id") || palabra.substring(i+1, palabra.length()-2).equals("tk_num")) {
+                        for (int j = 2; j < palabra.length(); j++) {
+                            if (palabra.charAt(j)==' ') {
+                            listaIdyNum.add(palabra.substring(2,j));
+                                j=palabra.length();
+                            }
+                        }
+                    }
+                    
+                    
                     
                     i=0;
                 }
