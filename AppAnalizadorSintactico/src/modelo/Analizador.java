@@ -136,7 +136,7 @@ public class Analizador {
                              generarPadre("tk_num", numRenglon);
                          }
                          if (temporal.equals("OPERACION")) {
-                             generarPadre("OPERACION", numRenglon);
+                             generarPadre("PARAMETRO", numRenglon);
                              generarPadre("TIPOOPE", numRenglon);
                          }
                         pila.push("PARAMETRO");
@@ -146,14 +146,13 @@ public class Analizador {
                       temporal = pila.pop();
                       numRenglon++;
                       listaSalida.add(generarRenglon(numRenglon, temporal));
-                         System.out.println("tk_) "+getPosicionLexema("tk_)"));
-                         System.out.println("PARAMETRO "+getPosicionLexema("PARAMETRO"));
+                         
                          if (getPosicionLexema("tk_)")>getPosicionLexema("PARAMETRO")) {
-                             System.out.println("-- )--");
+                             
                              generarPadre("tk_)", numRenglon);
                              generarPadreTresOpciones("IDASIG","VALOR", "OPERACION", numRenglon);
                          }else{
-                             System.out.println("** parametro **");
+                             
                              generarPadre("PARAMETRO", numRenglon);
                              generarPadre("tk_,", numRenglon);
                              generarPadreDosOpciones("IDASIG", "VALOR", numRenglon);
@@ -366,8 +365,12 @@ public class Analizador {
             }
             
              if (esFin()) {
-                pila.pop();
-                pila.pop();
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("FIN");
                 
                 verPila();
@@ -422,9 +425,22 @@ public class Analizador {
                 }
             }
              if (esPrograma()) {
-                pila.pop();
-                pila.pop();
-                pila.pop();
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadre("tk_}", numRenglon);
+                 generarPadre("tk_END", cont);
+                temporal = pila.pop();
+                numRenglon++;
+                listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadre("CODIGO", numRenglon);
+                 generarPadre("CODIGO", numRenglon);
+                 
+                 temporal=pila.pop();
+                 numRenglon++;
+                 listaSalida.add(generarRenglon(numRenglon, temporal));
+                 generarPadre("tk_{", numRenglon);
+                 generarPadre("tk_BEGIN", numRenglon);
                 pila.push("PROGRAMA");
                 verPila();
             }
@@ -1011,7 +1027,7 @@ public class Analizador {
         return renglon;
     }
     public void generarPadre(String palabra,int num){
-        for (int i = listaSalida.size()-2; i > 0; i--) {
+        for (int i = listaSalida.size()-2; i >= 0; i--) {
             if (listaSalida.get(i).getLexema().equals(palabra) && listaSalida.get(i).isFpadre()==false) {
                 listaSalida.get(i).setPadre(num);
                 listaSalida.get(i).setFpadre(true);
