@@ -33,8 +33,19 @@ public class Analizador {
         historiaPila = new ArrayList<String>();
         listaSalida = new ArrayList<Renglon>();
         generarPila();
-        
+        asginarValores();
     }
+    public void asginarValores(){
+        int conteo = 0;
+        for (int i = 0; i < listaSalida.size(); i++) {
+            if (listaSalida.get(i).getLexema().equals("tk_id") && listaSalida.get(i).isFid()==false || listaSalida.get(i).getLexema().equals("tk_num") && listaSalida.get(i).isFid()==false) {
+                listaSalida.get(i).setLexema(listaSalida.get(i).getLexema()+"("+listaIdyNum.get(conteo)+")");
+                listaSalida.get(i).setFid(true);
+                conteo++;
+            }
+        }
+    }
+    
     public void verPila(){
         Stack<String> pilaTemporal = (Stack<String>) pila.clone();
         Stack<String> pila3 = new Stack<String>();
